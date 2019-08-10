@@ -7,7 +7,7 @@
         "lower_snake_case"
       ],
       "no_summary": "warning",
-      "no_array_responses": "error",
+      "no_array_responses": "off",
       "parameter_order": "warning",
       "unused_tag": "warning"
     },
