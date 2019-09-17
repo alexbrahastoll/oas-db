@@ -50,22 +50,22 @@ paths:
     get:
       summary: Allows a partner to fetch profile info from a customer it has sold at least one product to.
       operationId: show_customer_by_token
-    tags:
-      - customer
-    parameters:
-      - name: customer_token
-        in: path
-        required: true
-        description: A token that identifies a customer and gives access to its information.
-        schema:
-          type: string
-    responses:
-      200:
-        description: Profile information of a customer.
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/Customer"
+      tags:
+        - customer
+      parameters:
+        - name: customer_token
+          in: path
+          required: true
+          description: A token that identifies a customer and gives access to its information.
+          schema:
+            type: string
+      responses:
+        200:
+          description: Profile information of a customer.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Customer"
 components:
   schemas:
     Order:
