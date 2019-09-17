@@ -18,3 +18,16 @@ A sample describing a fictional ecommerce API. This sample includes the followin
 antipatterns:
   - Usage of sequential integer IDs instead of UUIDs
   - Deep paths
+  - Presence of sensitive information in the query string
+
+## Adding / editing samples
+
+Before adding or editing a sample, please run it through the IBM OpenAPI Validator
+(using the configurations present in the `.validaterc` in the root of this project)
+and make sure it passes the linter.
+
+If the linter is installed, run the following command in the root of this project:
+
+```
+lint-openapi a-sample-name.yml
+```

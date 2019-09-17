@@ -46,6 +46,26 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Item"
+  /customers/{customer_token}:
+    get:
+      summary: Allows a partner to fetch profile info from a customer it has sold at least one product to.
+      operationId: show_customer_by_token
+    tags:
+      - customer
+    parameters:
+      - name: customer_token
+        in: path
+        required: true
+        description: A token that identifies a customer and gives access to its information.
+        schema:
+          type: string
+    responses:
+      200:
+        description: Profile information of a customer.
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Customer"
 components:
   schemas:
     Order:
@@ -92,3 +112,19 @@ components:
           description: The price of each unity of this item.
           type: number
           format: float
+    Customer:
+      description: Profile information of a customer.
+      required:
+        - name
+        - date_of_birth
+        - email
+      properties:
+        name:
+          description: The full name of a customer.
+          type: string
+        date_of_birth:
+          description: "The data of birth of a customer. Format: mm-dd-yyyy"
+          type: string
+        email:
+          description: The email of a customer.
+          type: string
