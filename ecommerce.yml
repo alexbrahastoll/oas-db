@@ -20,6 +20,26 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Orders"
+  /orders/{order_id}:
+    post:
+      summary: Shows a given order.
+      operationId: show_order
+      tags:
+        - orders
+      parameters:
+        - name: order_id
+          in: path
+          required: true
+          description: The id of an order.
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Details of an order.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Order"
   /orders/{order_id}/items/{item_id}:
     get:
       summary: Shows an item of a given order.
