@@ -1,0 +1,36 @@
+{
+  "version": "oas-db-0.1",
+  "annotationTarget": "ecommerce.yaml",
+  "violations": [
+    {
+      "type": "no_hypermedia_support",
+      "categories": ["discoverability"],
+      "offender": "paths./orders"
+    },
+    {
+      "type": "sequential_integer_id",
+      "categories": ["security"],
+      "offender": "paths./orders/{order_id}"
+    },
+    {
+      "type": "inappropriate_http_method",
+      "categories": ["compatibility", "understandability"],
+      "offender": "paths./orders/{order_id}"
+    },
+    {
+      "type": "sequential_integer_id",
+      "categories": ["security"],
+      "offender": "paths./orders/{order_id}/items/{item_id}"
+    },
+    {
+      "type": "deep_path",
+      "categories": ["understandability", "security"],
+      "offender": "paths./orders/{order_id}/items/{item_id}"
+    },
+    {
+      "type": "sensitive_info_pqs",
+      "categories": ["security"],
+      "offender": "paths./customers/{customer_token}"
+    }
+  ]
+}
