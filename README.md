@@ -1,24 +1,26 @@
 # OAS DB
 
 OAS DB is an effort to build a repository of OpenAPI specification samples with
-known antipatterns.
-
-This database of specs is going to consist of two separate sets of specifications,
-both containing samples presenting the same set of good practices violations. This
-design is going to allow researchers to use one of the sets for development of
-models / tools and the other one for validation.
+known antipatterns. Each specification is also accompanied by an annotation file
+in the JSON format. The annotation file lists all antipatterns found in the related
+specification, describing which part of the spec is responsible for which offense.
+Since the annotation files follow a clearly defined schema (soon to be added to this
+repository), they are a convenient tool for researchers to programatically verify the performance of
+their tools when run against OAS DB.
 
 This repository is still in its very early stages.
 
-## Development samples
+## List of available samples
 
-**ecommerce.yml**
+**ecommerce.yml (and ecommerce.json annotation)**
 
-A sample describing a fictional ecommerce API. This sample includes the following
+A sample describing a fictional ecommerce API. This sample presents the following
 antipatterns:
-  - Usage of sequential integer IDs instead of UUIDs
-  - Deep paths
-  - Presence of sensitive information in the query string
+  - Lack of hypermedia support
+  - Sequential integers as resource ID
+  - Inappropriate HTTP method
+  - Deep path
+  - Sensitive information in the path or in the query string
 
 ## Adding / editing samples
 
