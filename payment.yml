@@ -1,0 +1,53 @@
+openapi: 3.0.0
+info:
+  version: 1.0.0
+  title: Payments Provider
+  license:
+    name: MIT
+servers:
+  - url: http://example.com/v1/api
+paths:
+  /charges/{charge_id}:
+    post:
+      summary: Shows details on a given charge.
+      operationId: show_charge
+      tags:
+        - charges
+      parameters:
+        - name: charge_id
+          in: path
+          required: true
+          description: The id of a charge.
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Details of a charge.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Charge"
+components:
+  schemas:
+    Charge:
+      description: A charge.
+      required:
+        - amount
+        - currency
+        - credit_card_id
+      properties:
+        id:
+          description: The unique identifier of a charge.
+          type: integer
+          format: int64
+        amount:
+          description: The amount to be charged.
+          type: number
+          format: double
+        currency:
+          description: Three-letter ISO currency code.
+          type: string
+        credit_card_id:
+          description: The credit card to be charged.
+          type: integer
+          format: int64

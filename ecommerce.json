@@ -1,6 +1,6 @@
 {
   "version": "oas-db-0.1",
-  "annotationTarget": "ecommerce.yaml",
+  "annotationTarget": "ecommerce.yml",
   "violations": [
     {
       "type": "no_hypermedia_support",

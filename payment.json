@@ -1,0 +1,18 @@
+{
+  "version": "oas-db-0.1",
+  "annotationTarget": "payment.yml",
+  "violations": [
+    {
+      "type": "sequential_integer_id",
+      "categories": ["security"],
+      "offender": "paths./charges/{charge_id}",
+      "location": 10
+    },
+    {
+      "type": "inappropriate_http_method",
+      "categories": ["compatibility", "understandability"],
+      "offender": "paths./charges/{charge_id}",
+      "location": 10
+    }
+  ]
+}
