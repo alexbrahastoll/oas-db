@@ -1,16 +1,13 @@
 # OAS DB
 
-OAS DB is an effort to build a repository of OpenAPI specification samples with
+OAS DB is a proof of concept of a repository of synthetic but realistic OpenAPI specification samples with
 known antipatterns.
 
-This database of specs is going to consist of two separate sets of specifications,
-both containing samples presenting the same set of good practices violations. This
-design is going to allow researchers to use one of the sets for development of
-models / tools and the other one for validation.
+The purpose of OAS DB is to eventually become a large repository of samples to help researchers developing tools and techniques leveraging OpenAPI specifications.
 
-This repository is still in its very early stages.
+Since OAS DB (in its current incarnation) is just a proof of concept, it currently has only a few OpenAPI samples.
 
-## Development samples
+## Available samples
 
 **ecommerce.yml**
 
