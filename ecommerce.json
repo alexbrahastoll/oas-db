@@ -5,32 +5,38 @@
     {
       "type": "no_hypermedia_support",
       "categories": ["discoverability"],
-      "offender": "paths./orders"
+      "offender": "paths./orders",
+      "location": 10
     },
     {
       "type": "sequential_integer_id",
       "categories": ["security"],
-      "offender": "paths./orders/{order_id}"
+      "offender": "paths./orders/{order_id}",
+      "location": 23
     },
     {
       "type": "inappropriate_http_method",
       "categories": ["compatibility", "understandability"],
-      "offender": "paths./orders/{order_id}"
+      "offender": "paths./orders/{order_id}",
+      "location": 23
     },
     {
       "type": "sequential_integer_id",
       "categories": ["security"],
-      "offender": "paths./orders/{order_id}/items/{item_id}"
+      "offender": "paths./orders/{order_id}/items/{item_id}",
+      "location": 43
     },
     {
       "type": "deep_path",
       "categories": ["understandability", "security"],
-      "offender": "paths./orders/{order_id}/items/{item_id}"
+      "offender": "paths./orders/{order_id}/items/{item_id}",
+      "location": 43
     },
     {
       "type": "sensitive_info_pqs",
       "categories": ["security"],
-      "offender": "paths./customers/{customer_token}"
+      "offender": "paths./customers/{customer_token}",
+      "location": 69
     }
   ]
 }
