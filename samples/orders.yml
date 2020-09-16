@@ -1,0 +1,42 @@
+openapi: 3.0.3
+info:
+  title: Orders
+  description: API that allows a seller to obtain information about orders received in a marketplace. Inspired by Amazon's Selling Partner API for Orders.
+  version: 1.0.0
+servers:
+  - url: https://example.com/orders
+paths:
+  /read_orders:
+    get:
+      summary: List all orders received.
+      operationId: list_orders
+      tags:
+        - orders
+      responses:
+        200:
+          description: An array of orders
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Orders"
+components:
+  schemas:
+    Order:
+      description: An order.
+      required:
+        - id
+        - total
+      properties:
+        id:
+          description: The unique identifier of an order.
+          type: integer
+          format: int64
+        total:
+          description: The order's total in cents.
+          type: integer
+          format: int64
+    Orders:
+      description: A collection of orders.
+      type: array
+      items:
+        $ref: "#/components/schemas/Order"

@@ -1,0 +1,11 @@
+{
+  "version": "0.1",
+  "annotationTarget": "annotations/orders.yml",
+  "antipatterns": [
+    {
+      "name": "amorphous_uri",
+      "offender": "paths./read_orders",
+      "location": 9
+    },
+  ]
+}
