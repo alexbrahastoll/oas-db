@@ -3,5 +3,20 @@
     "name": "amorphous_uri",
     "categories": ["uri_design"],
     "iso25010_categories": ["usability", "satisfaction"]
+  },
+  {
+    "name": "crudy_uri",
+    "categories": ["uri_design"],
+    "iso25010_categories": ["compatibility", "usability", "efficiency", "satisfaction"]
+  },
+  {
+    "name": "pluralized_node",
+    "categories": ["uri_design"],
+    "iso25010_categories": ["usability", "satisfaction"]
+  },
+  {
+    "name": "inappropriate_http_method",
+    "categories": ["http_methods"],
+    "iso25010_categories": ["performance", "compatibility", "usability", "efficiency", "satisfaction"]
   }
 ]

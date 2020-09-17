@@ -4,8 +4,23 @@
   "antipatterns": [
     {
       "name": "amorphous_uri",
-      "offender": "paths./read_orders",
+      "offender": "paths./READORDERS",
       "location": 9
     },
+    {
+      "name": "crudy_uri",
+      "offender": "paths./READORDERS",
+      "location": 9
+    },
+    {
+      "name": "pluralized_node",
+      "offender": "paths./order_cancellation",
+      "location": 22
+    },
+    {
+      "name": "inappropriate_http_method",
+      "offender": "paths./orders/{order_id}/buyer_info",
+      "location": 31
+    }
   ]
 }

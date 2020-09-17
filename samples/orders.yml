@@ -6,7 +6,7 @@ info:
 servers:
   - url: https://example.com/orders
 paths:
-  /read_orders:
+  /READORDERS:
     get:
       summary: List all orders received.
       operationId: list_orders
@@ -19,8 +19,49 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Orders"
+  /order_cancellation:
+    post:
+      summary: Creates an order cancellation (i.e., cancels a given order)
+      operationId: order_cancellation
+      tags:
+        - orders
+      responses:
+        201:
+          description: Confirmation that the order was cancelled.
+  /orders/{order_id}/buyer_info:
+    post:
+      summary: Retrieves the buyer information for a given order.
+      operationId: get_buyer_info
+      tags:
+        - orders
+        - buyer_info
+      parameters:
+        - name: order_id
+          in: path
+          required: true
+          description: The id of an order.
+          schema:
+            type: integer
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Buyer"
 components:
   schemas:
+    Buyer:
+      description: The buyer of an order.
+      required:
+        - email
+        - name
+      properties:
+        email:
+          description: The email of the buyer.
+          type: string
+        name:
+          description: The name of the buyer.
+          type: string
     Order:
       description: An order.
       required:
