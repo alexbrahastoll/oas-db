@@ -26,10 +26,7 @@
     "paths": {
       "missing_path_parameter": "error",
       "snake_case_only": "off",
-      "paths_case_convention": [
-        "error",
-        "lower_snake_case"
-      ]
+      "paths_case_convention": "off"
     },
     "responses": {
       "inline_response_schema": "warning"
