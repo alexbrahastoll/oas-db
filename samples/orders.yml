@@ -1,8 +1,8 @@
 openapi: 3.0.3
 info:
-  title: Orders
+  title: Orders API
   description: API that allows a seller to obtain information about orders received in a marketplace. Inspired by Amazon's Selling Partner API for Orders.
-  version: 1.0.0
+  version: '0.1'
 servers:
   - url: https://example.com/orders
 paths:
@@ -13,7 +13,7 @@ paths:
       tags:
         - orders
       responses:
-        200:
+        '200':
           description: An array of orders
           content:
             application/json:
@@ -26,7 +26,7 @@ paths:
       tags:
         - orders
       responses:
-        201:
+        '201':
           description: Confirmation that the order was cancelled.
   /orders/{order_id}/buyer_info:
     post:
@@ -43,7 +43,7 @@ paths:
           schema:
             type: integer
       responses:
-        200:
+        '200':
           content:
             application/json:
               schema:

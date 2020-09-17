@@ -18,5 +18,15 @@
     "name": "inappropriate_http_method",
     "categories": ["http_methods"],
     "iso25010_categories": ["performance", "compatibility", "usability", "efficiency", "satisfaction"]
+  },
+  {
+    "name": "sequential_integer_id",
+    "categories": [],
+    "iso25010_categories": ["security"]
+  },
+  {
+    "name": "ignoring_status_code",
+    "categories": ["error_handling"],
+    "iso25010_categories": ["compatibility", "usability", "satisfaction"]
   }
 ]

@@ -1,12 +1,33 @@
-openapi: 3.0.0
+openapi: 3.0.3
 info:
-  version: 1.0.0
-  title: Payments Provider
-  license:
-    name: MIT
+  title: Payments Provider API.
+  description: API that allows one to charge customers via credit card. Inspired by Stripe's API.
+  version: '0.1'
 servers:
   - url: http://example.com/v1/api
 paths:
+  /charges:
+    post:
+      summary: Creates a new charge.
+      operationId: create_charge
+      tags:
+        - charges
+      requestBody:
+        description: The charge to be created.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Charge"
+      responses:
+        '200':
+          description: An error occurred and the charge was not created.
+          content:
+            schema:
+              $ref: "#/components/schemas/ChargeError"
+        '201':
+          description: The charge was successfully created.
+
   /charges/{charge_id}:
     post:
       summary: Shows details on a given charge.
@@ -21,7 +42,7 @@ paths:
           schema:
             type: integer
       responses:
-        200:
+        '200':
           description: Details of a charge.
           content:
             application/json:
@@ -51,3 +72,9 @@ components:
           description: The credit card to be charged.
           type: integer
           format: int64
+    ChargeError:
+      description: Represents an error occurred while trying to create a charge.
+      properties:
+        message:
+          description: The description of the error.
+          type: string
