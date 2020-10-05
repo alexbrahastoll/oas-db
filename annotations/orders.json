@@ -1,6 +1,6 @@
 {
   "version": "0.1",
-  "annotationTarget": "samples/orders.yml",
+  "annotationTarget": "samples/orders.json",
   "antipatterns": [
     {
       "name": "amorphous_uri",

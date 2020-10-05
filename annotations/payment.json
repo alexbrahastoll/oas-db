@@ -1,6 +1,6 @@
 {
   "version": "0.1",
-  "annotationTarget": "samples/payment.yml",
+  "annotationTarget": "samples/payment.json",
   "antipatterns": [
     {
       "name": "sequential_integer_id",
