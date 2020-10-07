@@ -4,7 +4,27 @@ OAS DB is an effort to build a repository of synthetic (but realistic) OpenAPI s
 
 The annotation files follow a clearly defined schema (soon to be added to this repository) and therefore are a convenient tool for researchers to programatically verify the performance of their tools when run against OAS DB.
 
-Since OAS DB (in its current incarnation) is just a proof of concept, it currently has only a few OpenAPI samples.
+OAS DB is a work in progress and although it currently has only a few OpenAPI samples, new one are being added every week or so.
+
+If you are interested in the project, we recommend you also read [the paper we presented at SATToSE 2020](http://sattose.org/).
+
+## Repository structure
+
+OAS DB is composed of the following directories and files:
+
+### samples
+
+This directory contains all OpenAPI samples.
+
+### annotations
+
+This directory contains all annotation files. Each annotation file describes all the antipatterns present in the corresponding OpenAPI sample.
+
+Example: `annotations/orders.json` lists all the antipatterns to be found in `samples/orders.json`
+
+### meta
+
+This directory contains files that supplement and enhance OAS DB itself.
 
 ## List of available samples
 
@@ -19,6 +39,8 @@ Describes an ecommerce API.
 Describes a payments provider API.
 
 ## Adding / editing samples
+
+> IMPORTANT: We are not accepting contributions at the moment. This section is a work in progress for the process we are envisioning after contributions are open to the research community at large.
 
 Before adding or editing a sample, please run it through the IBM OpenAPI Validator
 (using the configurations present in the `.validaterc` in the root of this project)
