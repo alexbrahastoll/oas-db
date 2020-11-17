@@ -1,7 +1,7 @@
 module OASDB
   module Generator
     class Sample
-      attr_accessor :oas_seed, :oas_seed_basename, :raffled_antipatterns, :base_resource, :contents
+      attr_accessor :oas_seed, :oas_seed_basename, :raffled_antipatterns, :base_resource, :contents, :annotation
 
       def initialize(oas_seed, oas_seed_basename, raffled_antipatterns)
         @oas_seed = oas_seed
@@ -13,6 +13,8 @@ module OASDB
         contents['info'] = oas_seed['info']
         contents['components'] = oas_seed['components']
         contents['paths'] = {}
+
+        @annotation = OASDB::Generator::Annotation.new
       end
 
       def base_resource_name

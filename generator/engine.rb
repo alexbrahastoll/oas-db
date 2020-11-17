@@ -3,6 +3,7 @@ require 'digest'
 require 'active_support/all'
 require_relative 'sample'
 require_relative 'create_operation'
+require_relative 'annotation'
 
 module OASDB
   module Generator
@@ -30,7 +31,13 @@ module OASDB
           generated_samples << sample unless generated_samples.map(&:md5).include?(sample.md5)
         end
 
-        @generated_samples.each { |s| File.write("samples/#{s.basename}", s.raw) }
+        @generated_samples.each do |s|
+          sample_path = "samples/#{s.basename}"
+          s.annotation.annotation_target = sample_path
+
+          File.write(sample_path, s.raw)
+          File.write("annotations/#{s.basename}", s.annotation.raw)
+        end
       end
 
       def generate_sample
@@ -55,7 +62,7 @@ module OASDB
         end
       end
 
-      def gen_path(correct_path, prefix = '/')
+      def gen_path(sample, correct_path, prefix = '/')
         return prefix + correct_path unless raffled_antipatterns.include?('amorphous_uri')
 
         path_distortions = [
@@ -69,11 +76,13 @@ module OASDB
           ->(path) { "-#{path}" },
           ->(path) { path.upcase }
         ]
+        distorted_path = prefix + path_distortions.sample(random: random).call(correct_path)
 
-        prefix + path_distortions.sample(random: random).call(correct_path)
+        sample.annotation.add_antipattern('amorphous_uri', "paths.#{distorted_path}")
+        distorted_path
       end
     end
   end
 end
 
-OASDB::Generator::Engine.new(121212, 'sample_seeds/incident_response.json', 3).run
+OASDB::Generator::Engine.new(121212, 'sample_seeds/incident_response.json', 1).run

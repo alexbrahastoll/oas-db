@@ -3,7 +3,7 @@ module OASDB
     class CreateOperation
       def generate(engine, sample)
         {
-          engine.gen_path("#{sample.base_resource_pretty_name.pluralize}") => {
+          engine.gen_path(sample, "#{sample.base_resource_pretty_name.pluralize}") => {
             'post' => {
               'summary' => "Creates a new #{sample.base_resource_pretty_name}",
               'operationId' => "create_#{sample.base_resource_pretty_name}",
