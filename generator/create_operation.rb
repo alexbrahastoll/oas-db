@@ -2,8 +2,11 @@ module OASDB
   module Generator
     class CreateOperation
       def generate(engine, sample)
+        correct_path_without_prefix = sample.base_resource_pretty_name.pluralize
+        generated_path = engine.gen_path(sample, correct_path_without_prefix)
+
         {
-          engine.gen_path(sample, "#{sample.base_resource_pretty_name.pluralize}") => {
+          generated_path => {
             'post' => {
               'summary' => "Creates a new #{sample.base_resource_pretty_name}",
               'operationId' => "create_#{sample.base_resource_pretty_name}",
@@ -20,7 +23,7 @@ module OASDB
                 }
               },
               'responses' => {
-                engine.gen_response_code(201) => {
+                engine.gen_response_code(sample, ['paths', generated_path, 'post', 'responses'], 201) => {
                   'description' => 'Created.',
                   'content' => {
                     'application/json' => {

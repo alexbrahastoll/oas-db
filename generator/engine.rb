@@ -52,14 +52,18 @@ module OASDB
         sample
       end
 
-      def gen_response_code(correct_code)
+      def gen_response_code(sample, breadcrumb, correct_code)
         return correct_code.to_s unless raffled_antipatterns.include?('ignoring_status_code')
 
-        if correct_code >= 200 && correct_code <= 299
-          [200, 201, 202, 203, 204, 205, 206, 207, 208, 226].
-            reject { |code| code == correct_code }.
-            sample(random: random)
-        end
+        raffled_code =
+          if correct_code >= 200 && correct_code <= 299
+            [200, 201, 202, 203, 204, 205, 206, 207, 208, 226].
+              reject { |code| code == correct_code }.
+              sample(random: random)
+          end
+
+        sample.annotation.add_antipattern('ignoring_status_code', breadcrumb + [raffled_code.to_s])
+        raffled_code
       end
 
       def gen_path(sample, correct_path, prefix = '/')
@@ -78,11 +82,11 @@ module OASDB
         ]
         distorted_path = prefix + path_distortions.sample(random: random).call(correct_path)
 
-        sample.annotation.add_antipattern('amorphous_uri', "paths.#{distorted_path}")
+        sample.annotation.add_antipattern('amorphous_uri', ['paths', distorted_path])
         distorted_path
       end
     end
   end
 end
 
-OASDB::Generator::Engine.new(121212, 'sample_seeds/incident_response.json', 1).run
+OASDB::Generator::Engine.new(121212, 'sample_seeds/incident_response.json', 2).run
