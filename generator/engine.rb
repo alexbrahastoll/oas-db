@@ -10,6 +10,8 @@ module OASDB
     class Engine
       attr_accessor :random, :oas_seed, :oas_seed_basename, :desired_num_samples, :antipatterns, :generated_samples, :raffled_antipatterns
 
+      HTTP_METHODS = ['get', 'post', 'head', 'put', 'delete'].freeze
+
       def initialize(random_generator_seed, oas_seed_path, desired_num_samples)
         @random = Random.new(random_generator_seed)
         @oas_seed = JSON.parse(File.read(oas_seed_path))
@@ -43,7 +45,7 @@ module OASDB
       def generate_sample
         antipatterns_num = random.rand(antipatterns.length) + 1 # +1 guarantees a range from 1 to length
         shuffled_antipatterns = antipatterns.shuffle(random: random)
-        @raffled_antipatterns = ['amorphous_uri', 'ignoring_status_code'] # shuffled_antipatterns.take(antipatterns_num)
+        @raffled_antipatterns = ['amorphous_uri', 'ignoring_status_code', 'inappropriate_http_method'] # shuffled_antipatterns.take(antipatterns_num)
 
         sample = OASDB::Generator::Sample.new(oas_seed, oas_seed_basename, raffled_antipatterns)
 
@@ -52,7 +54,7 @@ module OASDB
         sample
       end
 
-      def gen_response_code(sample, breadcrumb, correct_code)
+      def gen_response_code(sample, correct_code, breadcrumb)
         return correct_code.to_s unless raffled_antipatterns.include?('ignoring_status_code')
 
         raffled_code =
@@ -84,6 +86,15 @@ module OASDB
 
         sample.annotation.add_antipattern('amorphous_uri', ['paths', distorted_path])
         distorted_path
+      end
+
+      def gen_method(sample, correct_method, breadcrumb)
+        return correct_method unless raffled_antipatterns.include?('inappropriate_http_method')
+
+        inappropriate_method = HTTP_METHODS.filter { |m| m != correct_method }.sample(random: random)
+
+        sample.annotation.add_antipattern('inappropriate_http_method', breadcrumb + [inappropriate_method])
+        inappropriate_method
       end
     end
   end

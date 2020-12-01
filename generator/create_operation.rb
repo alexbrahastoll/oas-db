@@ -7,7 +7,7 @@ module OASDB
 
         {
           generated_path => {
-            'post' => {
+            engine.gen_method(sample, 'post', ['paths', generated_path]) => {
               'summary' => "Creates a new #{sample.base_resource_pretty_name}",
               'operationId' => "create_#{sample.base_resource_pretty_name}",
               'tags' => [sample.base_resource_pretty_name],
@@ -23,7 +23,7 @@ module OASDB
                 }
               },
               'responses' => {
-                engine.gen_response_code(sample, ['paths', generated_path, 'post', 'responses'], 201) => {
+                engine.gen_response_code(sample, 201, ['paths', generated_path, 'post', 'responses']) => {
                   'description' => 'Created.',
                   'content' => {
                     'application/json' => {
