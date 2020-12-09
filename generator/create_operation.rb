@@ -3,11 +3,12 @@ module OASDB
     class CreateOperation
       def generate(engine, sample)
         correct_path_without_prefix = sample.base_resource_pretty_name.pluralize
-        generated_path = engine.gen_path(sample, correct_path_without_prefix)
+        pregenerated_method = engine.pregen_method('post')
+        generated_path = engine.gen_path(sample, correct_path_without_prefix, pregenerated_method)
 
         {
           generated_path => {
-            engine.gen_method(sample, 'post', ['paths', generated_path]) => {
+            engine.gen_method(sample, 'post', pregenerated_method, ['paths', generated_path]) => {
               'summary' => "Creates a new #{sample.base_resource_pretty_name}",
               'operationId' => "create_#{sample.base_resource_pretty_name}",
               'tags' => [sample.base_resource_pretty_name],

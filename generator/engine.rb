@@ -10,7 +10,7 @@ module OASDB
     class Engine
       attr_accessor :random, :oas_seed, :oas_seed_basename, :desired_num_samples, :antipatterns, :generated_samples, :raffled_antipatterns
 
-      HTTP_METHODS = ['get', 'post', 'head', 'put', 'delete'].freeze
+      HTTP_METHODS = ['get', 'post', 'head', 'put', 'patch', 'delete'].freeze
 
       def initialize(random_generator_seed, oas_seed_path, desired_num_samples)
         @random = Random.new(random_generator_seed)
@@ -45,7 +45,7 @@ module OASDB
       def generate_sample
         antipatterns_num = random.rand(antipatterns.length) + 1 # +1 guarantees a range from 1 to length
         shuffled_antipatterns = antipatterns.shuffle(random: random)
-        @raffled_antipatterns = ['amorphous_uri', 'ignoring_status_code', 'inappropriate_http_method'] # shuffled_antipatterns.take(antipatterns_num)
+        @raffled_antipatterns = ['crudy_uri', 'amorphous_uri', 'ignoring_status_code', 'inappropriate_http_method'] # shuffled_antipatterns.take(antipatterns_num)
 
         sample = OASDB::Generator::Sample.new(oas_seed, oas_seed_basename, raffled_antipatterns)
 
@@ -68,36 +68,95 @@ module OASDB
         raffled_code
       end
 
-      def gen_path(sample, correct_path, prefix = '/')
-        return prefix + correct_path unless raffled_antipatterns.include?('amorphous_uri')
+      def gen_path(sample, correct_path, method, prefix = '/')
+        path = correct_path
+        path = crudy_uri(path, method) if raffled_antipatterns.include?('crudy_uri')
+        path = amorphous_uri(path) if raffled_antipatterns.include?('amorphous_uri')
+        path = prefix + path
 
-        path_distortions = [
-          ->(path) { "#{path}.json" },
-          ->(path) { "#{path}.xml" },
-          ->(path) { "#{path}_.json" },
-          ->(path) { "#{path}-.json" },
-          ->(path) { "#{path}_.xml" },
-          ->(path) { "#{path}-.xml" },
-          ->(path) { "_#{path}" },
-          ->(path) { "-#{path}" },
-          ->(path) { path.upcase }
-        ]
-        distorted_path = prefix + path_distortions.sample(random: random).call(correct_path)
+        sample.annotation.add_antipattern('crudy_uri', ['paths', path]) if raffled_antipatterns.include?('crudy_uri')
+        sample.annotation.add_antipattern('amorphous_uri', ['paths', path]) if raffled_antipatterns.include?('amorphous_uri')
 
-        sample.annotation.add_antipattern('amorphous_uri', ['paths', distorted_path])
-        distorted_path
+        path
       end
 
-      def gen_method(sample, correct_method, breadcrumb)
+      def pregen_method(correct_method)
         return correct_method unless raffled_antipatterns.include?('inappropriate_http_method')
 
-        inappropriate_method = HTTP_METHODS.filter { |m| m != correct_method }.sample(random: random)
+        HTTP_METHODS.filter { |m| m != correct_method }.sample(random: random)
+      end
 
-        sample.annotation.add_antipattern('inappropriate_http_method', breadcrumb + [inappropriate_method])
-        inappropriate_method
+      def gen_method(sample, correct_method, pregenerated_method, breadcrumb)
+        return correct_method unless raffled_antipatterns.include?('inappropriate_http_method')
+
+        sample.annotation.add_antipattern('inappropriate_http_method', breadcrumb + [pregenerated_method])
+        pregenerated_method
+      end
+
+      private
+
+      def self.gen_crudy_uri_distortions
+        distortions = {
+          'post' => [],
+          'get' => [],
+          'head' => [],
+          'put' => [],
+          'patch' => [],
+          'delete' => []
+        }
+
+        HTTP_METHOD_SYNONYMS.each do |method, synonyms|
+          synonyms.each do |synonym|
+            CRUDY_URI_SEPARATORS.each do |sep|
+              distortions[method] << ->(path) { synonym + sep + path }
+            end
+          end
+        end
+
+        distortions.freeze
+      end
+
+      PUT_PATCH_SYNONYMS = ['update', 'put', 'patch', 'refresh', 'amend', 'renovate', 'revise', 'renew', 'restore'].freeze
+      HTTP_METHOD_SYNONYMS = {
+        'post' => [
+          'create', 'post', 'build', 'construct', 'generate', 'make', 'produce', 'setup', 'spawn', 'start', 'author',
+          'compose', 'fabricate', 'formulate', 'perform', 'new'
+        ].freeze,
+        'get' => [
+          'read', 'get', 'fetch', 'retrieve', 'gather', 'scan', 'see', 'view'
+        ].freeze,
+        'head' => ['head'],
+        'put' => PUT_PATCH_SYNONYMS,
+        'patch' => PUT_PATCH_SYNONYMS,
+        'delete' => [
+          'delete', 'destroy', 'remove', 'eliminate', 'exclude', 'cancel', 'drop', 'obliterate', 'sanitize', 'squash',
+          'trim', 'truncate'
+        ]
+      }.freeze
+      CRUDY_URI_SEPARATORS = ['-', '_'].freeze
+      CRUDY_URI_DISTORTIONS = gen_crudy_uri_distortions
+
+      AMORPHOUS_URI_DISTORTIONS = [
+        ->(path) { "#{path}.json" },
+        ->(path) { "#{path}.xml" },
+        ->(path) { "#{path}_.json" },
+        ->(path) { "#{path}-.json" },
+        ->(path) { "#{path}_.xml" },
+        ->(path) { "#{path}-.xml" },
+        ->(path) { "_#{path}" },
+        ->(path) { "-#{path}" },
+        ->(path) { path.upcase }
+      ].freeze
+
+      def crudy_uri(path, method)
+        CRUDY_URI_DISTORTIONS[method].sample(random: random).call(path)
+      end
+
+      def amorphous_uri(path)
+        AMORPHOUS_URI_DISTORTIONS.sample(random: random).call(path)
       end
     end
   end
 end
 
-OASDB::Generator::Engine.new(121212, 'sample_seeds/incident_response.json', 2).run
+OASDB::Generator::Engine.new(1368, 'sample_seeds/incident_response.json', 3).run
