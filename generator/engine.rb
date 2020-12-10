@@ -3,6 +3,7 @@ require 'digest'
 require 'active_support/all'
 require_relative 'sample'
 require_relative 'create_operation'
+require_relative 'read_operation'
 require_relative 'annotation'
 
 module OASDB
@@ -50,6 +51,7 @@ module OASDB
         sample = OASDB::Generator::Sample.new(oas_seed, oas_seed_basename, raffled_antipatterns)
 
         sample.contents['paths'].merge!(OASDB::Generator::CreateOperation.new.generate(self, sample))
+        sample.contents['paths'].merge!(OASDB::Generator::ReadOperation.new.generate(self, sample))
 
         sample
       end
@@ -159,4 +161,4 @@ module OASDB
   end
 end
 
-OASDB::Generator::Engine.new(1368, 'sample_seeds/incident_response.json', 3).run
+OASDB::Generator::Engine.new(1368, 'sample_seeds/incident_response.json', 1).run

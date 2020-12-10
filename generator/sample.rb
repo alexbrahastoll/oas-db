@@ -13,6 +13,8 @@ module OASDB
         contents['info'] = oas_seed['info']
         contents['components'] = oas_seed['components']
         contents['paths'] = {}
+        generate_ids
+        generate_id_params
 
         @annotation = OASDB::Generator::Annotation.new
       end
@@ -29,12 +31,40 @@ module OASDB
         "g_#{oas_seed_basename}_#{md5}.json"
       end
 
+      def resource_id_name(resource_name, style)
+        style = :camelcase unless [:camelcase, :underscore].include?(style)
+        "#{resource_name}Id".send(style)
+      end
+
       def raw
         JSON.dump(contents)
       end
 
       def md5
         Digest::MD5.hexdigest(raw)
+      end
+
+      private
+
+      def generate_ids
+        contents['components']['schemas']['Id'] = {
+          'description' => 'A generic integer ID.',
+          'type' => 'integer',
+          'format' => 'int64'
+        }
+      end
+
+      def generate_id_params
+        contents['components']['parameters'] ||= {}
+        contents['components']['parameters'][resource_id_name(base_resource_name, :camelcase)] = {
+          'name' => resource_id_name(base_resource_name, :underscore),
+          'description' => "The id of a #{base_resource_pretty_name}",
+          'in' => 'path',
+          'required' => true,
+          'schema' => {
+            '$ref' => '#/components/schemas/Id'
+          }
+        }
       end
     end
   end

@@ -24,7 +24,7 @@ module OASDB
                 }
               },
               'responses' => {
-                engine.gen_response_code(sample, 201, ['paths', generated_path, 'post', 'responses']) => {
+                engine.gen_response_code(sample, 201, ['paths', generated_path, pregenerated_method, 'responses']) => {
                   'description' => 'Created.',
                   'content' => {
                     'application/json' => {
