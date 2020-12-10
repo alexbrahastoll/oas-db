@@ -95,8 +95,8 @@
               "application/json": {
                 "schema": {
                   "allOf": [
-                    { "$ref": "#/components/schemas/ProjectProperties" },
-                    { "$ref": "#/components/schemas/ProjectRequiredProperties" }
+                    { "$ref": "#/components/schemas/ProjectId" },
+                    { "$ref": "#/components/schemas/ProjectProperties" }
                   ]
                 }
               }
