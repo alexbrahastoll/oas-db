@@ -18,10 +18,11 @@ module OASDB
         @oas_seed = JSON.parse(File.read(oas_seed_path))
         @oas_seed_basename = File.basename(oas_seed_path, '.*')
         @desired_num_samples = desired_num_samples
-        @antipatterns =
-          JSON.
-            parse(File.read('meta/antipatterns.json')).
-            map { |antipattern| antipattern['name'] }
+        # @antipatterns =
+        #   JSON.
+        #     parse(File.read('meta/antipatterns.json')).
+        #     map { |antipattern| antipattern['name'] }
+        @antipatterns = ['crudy_uri', 'amorphous_uri', 'ignoring_status_code', 'inappropriate_http_method']
 
       end
 
@@ -46,7 +47,7 @@ module OASDB
       def generate_sample
         antipatterns_num = random.rand(antipatterns.length) + 1 # +1 guarantees a range from 1 to length
         shuffled_antipatterns = antipatterns.shuffle(random: random)
-        @raffled_antipatterns = ['crudy_uri', 'amorphous_uri', 'ignoring_status_code', 'inappropriate_http_method'] # shuffled_antipatterns.take(antipatterns_num)
+        @raffled_antipatterns = shuffled_antipatterns.take(antipatterns_num)
 
         sample = OASDB::Generator::Sample.new(oas_seed, oas_seed_basename, raffled_antipatterns)
 
@@ -161,4 +162,4 @@ module OASDB
   end
 end
 
-OASDB::Generator::Engine.new(1368, 'sample_seeds/incident_response.json', 1).run
+OASDB::Generator::Engine.new(1368, 'sample_seeds/incident_response.json', 50).run
