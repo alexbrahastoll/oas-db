@@ -1,0 +1,1 @@
+{"version":"0.1","annotationTarget":"samples/g_incident_response_5136a7637e7cae0602cf3a8ddfcd1abb.json","antipatterns":[{"name":"ignoring_status_code","offender":["paths","/incidents","post","responses","200"]},{"name":"ignoring_status_code","offender":["paths","/incidents/{incident_id}","get","responses","208"]}]}
