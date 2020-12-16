@@ -28,6 +28,10 @@ module OASDB
       end
 
       def basename
+        "g_#{oas_seed_basename}_#{md5}"
+      end
+
+      def basename_with_ext
         "g_#{oas_seed_basename}_#{md5}.json"
       end
 

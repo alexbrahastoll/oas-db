@@ -5,11 +5,12 @@ require_relative 'sample'
 require_relative 'create_operation'
 require_relative 'read_operation'
 require_relative 'annotation'
+require_relative 'api'
 
 module OASDB
   module Generator
     class Engine
-      attr_accessor :random, :oas_seed, :oas_seed_basename, :desired_num_samples, :antipatterns, :generated_samples, :raffled_antipatterns
+      attr_accessor :random, :oas_seed, :oas_seed_basename, :desired_num_samples, :antipatterns, :generated_samples, :generated_apis, :raffled_antipatterns
 
       HTTP_METHODS = ['get', 'post', 'head', 'put', 'patch', 'delete'].freeze
 
@@ -28,33 +29,44 @@ module OASDB
 
       def run
         @generated_samples = []
+        @generated_apis = []
 
         while generated_samples.length < desired_num_samples
-          sample = generate_sample
+          sample, api = generate_sample
 
-          generated_samples << sample unless generated_samples.map(&:md5).include?(sample.md5)
+          unless generated_samples.map(&:md5).include?(sample.md5)
+            generated_samples << sample
+            generated_apis << api
+          end
         end
 
-        @generated_samples.each do |s|
-          sample_path = "samples/#{s.basename}"
+        @generated_samples.each_with_index do |s, i|
+          sample_path = "samples/#{s.basename_with_ext}"
           s.annotation.annotation_target = sample_path
 
           File.write(sample_path, s.raw)
-          File.write("annotations/#{s.basename}", s.annotation.raw)
+          File.write("annotations/#{s.basename_with_ext}", s.annotation.raw)
+          File.write("apis/#{s.basename}.rb", generated_apis[i].contents)
         end
       end
 
       def generate_sample
         antipatterns_num = random.rand(antipatterns.length) + 1 # +1 guarantees a range from 1 to length
         shuffled_antipatterns = antipatterns.shuffle(random: random)
-        @raffled_antipatterns = shuffled_antipatterns.take(antipatterns_num)
+        # @raffled_antipatterns = shuffled_antipatterns.take(antipatterns_num)
+        @raffled_antipatterns = []
 
         sample = OASDB::Generator::Sample.new(oas_seed, oas_seed_basename, raffled_antipatterns)
 
-        sample.contents['paths'].merge!(OASDB::Generator::CreateOperation.new.generate(self, sample))
+        oas_create_operation = OASDB::Generator::CreateOperation.new.generate(self, sample)
+        sample.contents['paths'].merge!(oas_create_operation)
         sample.contents['paths'].merge!(OASDB::Generator::ReadOperation.new.generate(self, sample))
 
-        sample
+        api = OASDB::Generator::API.new
+        api.gen_setup_code
+        api.gen_code_create_operation(oas_seed, oas_create_operation)
+
+        [sample, api]
       end
 
       def gen_response_code(sample, correct_code, breadcrumb)
@@ -162,4 +174,4 @@ module OASDB
   end
 end
 
-OASDB::Generator::Engine.new(1368, 'sample_seeds/incident_response.json', 50).run
+OASDB::Generator::Engine.new(1368, 'sample_seeds/incident_response.json', 1).run

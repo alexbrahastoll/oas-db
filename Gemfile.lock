@@ -11,6 +11,18 @@ GEM
     i18n (1.8.5)
       concurrent-ruby (~> 1.0)
     minitest (5.14.2)
+    mustermann (1.1.1)
+      ruby2_keywords (~> 0.0.1)
+    rack (2.2.3)
+    rack-protection (2.1.0)
+      rack
+    ruby2_keywords (0.0.2)
+    sinatra (2.1.0)
+      mustermann (~> 1.0)
+      rack (~> 2.2)
+      rack-protection (= 2.1.0)
+      tilt (~> 2.0)
+    tilt (2.0.10)
     tzinfo (2.0.3)
       concurrent-ruby (~> 1.0)
     zeitwerk (2.4.2)
@@ -20,6 +32,7 @@ PLATFORMS
 
 DEPENDENCIES
   activesupport (= 6.1.0)
+  sinatra (= 2.1.0)
 
 BUNDLED WITH
    2.1.2
