@@ -59,12 +59,14 @@ module OASDB
         sample = OASDB::Generator::Sample.new(oas_seed, oas_seed_basename, raffled_antipatterns)
 
         oas_create_operation = OASDB::Generator::CreateOperation.new.generate(self, sample)
+        oas_read_operation = OASDB::Generator::ReadOperation.new.generate(self, sample)
         sample.contents['paths'].merge!(oas_create_operation)
-        sample.contents['paths'].merge!(OASDB::Generator::ReadOperation.new.generate(self, sample))
+        sample.contents['paths'].merge!(oas_read_operation)
 
         api = OASDB::Generator::API.new
         api.gen_setup_code
         api.gen_code_create_operation(oas_seed, oas_create_operation)
+        api.gen_code_read_operation(oas_seed, oas_read_operation)
 
         [sample, api]
       end

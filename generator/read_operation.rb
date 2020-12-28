@@ -29,6 +29,9 @@ module OASDB
                       }
                     }
                   }
+                },
+                '404' => {
+                  'description' => 'Not found.'
                 }
               }
             }

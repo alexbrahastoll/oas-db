@@ -28,6 +28,11 @@ module OASDB
                 ds[id] = obj
                 [true, obj]
               end
+
+              def read_obj(key)
+                obj = ds[key]
+                [!obj.nil?, obj]
+              end
             end
           end
 
@@ -57,7 +62,33 @@ module OASDB
         RUBY
       end
 
-      def gen_code_read_operation(oas_seed, oas_operation)  
+      def gen_code_read_operation(oas_seed, oas_operation)
+        path = oas_operation.keys.first
+        method = oas_operation[path].keys.first
+        response_code = oas_operation[path][method]['responses'].keys.first
+
+        param = path.match(/\{(.+)\}/).captures.first
+        sinatra_path = path.gsub(/\{.+\}/, ":#{param}")
+
+        contents.concat <<~RUBY
+          #{method} '#{sinatra_path}' do
+            request.body.rewind
+
+            obj_id = Integer(params['#{param}'])
+            found, obj = api_helper.read_obj(obj_id)
+
+            halt 404 unless found
+
+            res_body = JSON.dump(obj)
+            res_header = { 'Content-Type' => 'application/json' }
+
+            [#{response_code.to_i}, res_header, res_body]
+
+          rescue ArgumentError
+            halt 404
+          end
+
+        RUBY
       end
     end
   end
