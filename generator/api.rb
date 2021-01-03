@@ -13,6 +13,11 @@ module OASDB
             class GeneratedAPIHelper
               attr_reader :last_id, :ds
 
+              OAS_RUBY_DATA_VALIDATION = {
+                'string' => ->(data) { raise ArgumentError if String(data).length == 0 },
+                'integer' => ->(data) { Integer(data) }
+              }.freeze
+
               def initialize
                 @last_id = 0
                 @ds = {}
@@ -20,6 +25,23 @@ module OASDB
 
               def next_id
                 @last_id += 1
+              end
+
+              def validate_field(name, value, schema)
+                OAS_RUBY_DATA_VALIDATION[schema.dig(name, 'type')].call(value)
+                true
+              rescue ArgumentError
+                false
+              end
+
+              def valid_obj?(payload, schema)
+                validation_results = {}
+
+                payload.each do |name, value|
+                  validation_results[name] = validate_field(name, value, schema)
+                end
+
+                validation_results.values.all?
               end
 
               def create_obj(payload)
@@ -45,11 +67,14 @@ module OASDB
         path = oas_operation.keys.first
         method = oas_operation[path].keys.first
         response_code = oas_operation[path][method]['responses'].keys.first
+        schema_location = oas_operation[path][method]['requestBody']['content']['application/json']['schema']['$ref'].split('/')[1..-1].concat(['properties'])
+        schema = oas_seed.dig(*schema_location)
 
         contents.concat <<~RUBY
           #{method} '#{path}' do
             request.body.rewind
             payload = JSON.parse(request.body.read)
+            halt 422 unless api_helper.valid_obj?(payload, #{schema})
 
             result, obj = api_helper.create_obj(payload)
 
