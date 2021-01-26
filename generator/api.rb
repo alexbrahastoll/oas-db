@@ -8,6 +8,7 @@ module OASDB
           require 'sinatra'
           require 'json'
           require 'yaml'
+          require 'active_support/all'
 
           module OASDB
             class GeneratedAPIHelper
@@ -27,6 +28,16 @@ module OASDB
                 @last_id += 1
               end
 
+              def sanitize_payload(payload, schema)
+                sanitized_payload = payload.deep_dup
+
+                payload.each do |name, value|
+                  sanitized_payload.delete(name) unless schema[name].present?
+                end
+
+                [sanitized_payload.keys.length == payload.keys.length, sanitized_payload]
+              end
+
               def validate_field(name, value, schema)
                 OAS_RUBY_DATA_VALIDATION[schema.dig(name, 'type')].call(value)
                 true
@@ -35,6 +46,8 @@ module OASDB
               end
 
               def valid_obj?(payload, schema)
+                return false if payload.keys.length != schema.keys.length # Check for missing fields.
+
                 validation_results = {}
 
                 payload.each do |name, value|
@@ -73,10 +86,13 @@ module OASDB
         contents.concat <<~RUBY
           #{method} '#{path}' do
             request.body.rewind
+            schema = #{schema}
             payload = JSON.parse(request.body.read)
-            halt 422 unless api_helper.valid_obj?(payload, #{schema})
+            has_extra_keys, sanitized_payload = api_helper.sanitize_payload(payload, schema)
+            halt 422 if has_extra_keys
+            halt 422 unless api_helper.valid_obj?(sanitized_payload, schema)
 
-            result, obj = api_helper.create_obj(payload)
+            result, obj = api_helper.create_obj(sanitized_payload)
 
             res_body = JSON.dump(obj.slice('id'))
             res_header = { 'Content-Type' => 'application/json' }
