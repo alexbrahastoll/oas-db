@@ -10,6 +10,7 @@ module OASDB
         @base_resource = oas_seed['components']['schemas'].slice(oas_seed['components']['schemas'].keys.first)
 
         @contents = {}
+        contents['openapi'] = '3.0.3'
         contents['info'] = oas_seed['info']
         contents['components'] = oas_seed['components']
         contents['paths'] = {}

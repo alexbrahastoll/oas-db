@@ -4,13 +4,15 @@ require 'active_support/all'
 require_relative 'sample'
 require_relative 'create_operation'
 require_relative 'read_operation'
+require_relative 'delete_operation'
 require_relative 'annotation'
 require_relative 'api'
 
 module OASDB
   module Generator
     class Engine
-      attr_accessor :random, :oas_seed, :oas_seed_basename, :desired_num_samples, :antipatterns, :generated_samples, :generated_apis, :raffled_antipatterns
+      attr_accessor :random, :oas_seed, :oas_seed_basename, :desired_num_samples, :antipatterns, :generated_samples,
+        :generated_apis, :raffled_antipatterns
 
       HTTP_METHODS = ['get', 'post', 'head', 'put', 'patch', 'delete'].freeze
 
@@ -60,13 +62,26 @@ module OASDB
 
         oas_create_operation = OASDB::Generator::CreateOperation.new.generate(self, sample)
         oas_read_operation = OASDB::Generator::ReadOperation.new.generate(self, sample)
+        oas_delete_operation = OASDB::Generator::DeleteOperation.new.generate(self, sample)
+
         sample.contents['paths'].merge!(oas_create_operation)
         sample.contents['paths'].merge!(oas_read_operation)
+
+        delete_path = oas_delete_operation.keys.first
+        if sample.contents['paths'].keys.include?(delete_path)
+          # In a REST compliant API, many different operations share the same path.
+          # Therefore, we have to check if the path of the current operation is already present in order
+          # not to override other operations previously added to the specification being built.
+          sample.contents['paths'][delete_path].merge!(oas_delete_operation[delete_path])
+        else
+          sample.contents['paths'].merge!(oas_delete_operation)
+        end
 
         api = OASDB::Generator::API.new
         api.gen_setup_code
         api.gen_code_create_operation(oas_seed, oas_create_operation)
         api.gen_code_read_operation(oas_seed, oas_read_operation)
+        api.gen_code_delete_operation(oas_seed, oas_delete_operation)
 
         [sample, api]
       end

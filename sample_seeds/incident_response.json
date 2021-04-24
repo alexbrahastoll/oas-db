@@ -1,7 +1,7 @@
 {
   "info": {
     "title": "Incident response API",
-    "description": "API that allows one to report and manage incidents that happen in an online service (e.g. an ecommerce) an the response to them.",
+    "description": "API that allows one to report and manage incidents that happen in an online service (e.g. an ecommerce).",
     "version": "0.1"
   },
   "components": {

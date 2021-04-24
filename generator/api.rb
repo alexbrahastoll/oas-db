@@ -35,7 +35,7 @@ module OASDB
                   sanitized_payload.delete(name) unless schema[name].present?
                 end
 
-                [sanitized_payload.keys.length == payload.keys.length, sanitized_payload]
+                [sanitized_payload.keys.length != payload.keys.length, sanitized_payload]
               end
 
               def validate_field(name, value, schema)
@@ -67,6 +67,11 @@ module OASDB
               def read_obj(key)
                 obj = ds[key]
                 [!obj.nil?, obj]
+              end
+
+              def delete_obj(key)
+                obj = ds.delete(key)
+                !obj.nil?
               end
             end
           end
@@ -124,7 +129,31 @@ module OASDB
             res_header = { 'Content-Type' => 'application/json' }
 
             [#{response_code.to_i}, res_header, res_body]
+          rescue ArgumentError
+            halt 404
+          end
 
+        RUBY
+      end
+
+      def gen_code_delete_operation(oas_seed, oas_operation)
+        path = oas_operation.keys.first
+        method = oas_operation[path].keys.first
+        response_code = oas_operation[path][method]['responses'].keys.first
+
+        param = path.match(/\{(.+)\}/).captures.first
+        sinatra_path = path.gsub(/\{.+\}/, ":#{param}")
+
+        contents.concat <<~RUBY
+          #{method} '#{sinatra_path}' do
+            request.body.rewind
+
+            obj_id = Integer(params['#{param}'])
+            deleted = api_helper.delete_obj(obj_id)
+
+            halt 404 unless deleted
+
+            #{response_code.to_i}
           rescue ArgumentError
             halt 404
           end
