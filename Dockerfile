@@ -14,7 +14,7 @@ RUN dpkg --purge packages-microsoft-prod && \
   apt-transport-https \
   build-essential \
   curl \
-  dotnet-sdk-3.1 \
+  dotnet-sdk-5.0 \
   gcc \
   git \
   libbz2-dev \
@@ -29,6 +29,7 @@ RUN dpkg --purge packages-microsoft-prod && \
   make \
   python-openssl \
   tk-dev \
+  vim \
   xz-utils \
   zlib1g \
   zlib1g-dev
@@ -43,9 +44,13 @@ RUN asdf plugin-add python && \
   asdf global python 3.8.2 && \
   asdf install ruby 2.7.2 && \
   asdf global ruby 2.7.2
+RUN python3 -m ensurepip && \
+  pip3 install --upgrade pip
 RUN git clone https://github.com/microsoft/restler-fuzzer.git ~/restler-fuzzer && \
   mkdir ~/restler-fuzzer-bin && \
   cd ~/restler-fuzzer && \
+  pip3 install requests && \
+  pip3 install applicationinsights && \
   python ./build-restler.py --dest_dir ~/restler-fuzzer-bin
 
 COPY . /root/oas_db
