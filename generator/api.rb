@@ -35,7 +35,7 @@ module OASDB
                   sanitized_payload.delete(name) unless schema[name].present?
                 end
 
-                [sanitized_payload.keys.length != payload.keys.length, sanitized_payload]
+                sanitized_payload
               end
 
               def validate_field(name, value, schema)
@@ -45,8 +45,12 @@ module OASDB
                 false
               end
 
-              def valid_obj?(payload, schema)
-                return false if payload.keys.length != schema.keys.length # Check for missing fields.
+              def valid_obj?(payload, schema, mode = :create)
+                if mode == :create
+                  return false if payload.keys.length != schema.keys.length # Check for missing fields.
+                else # :update
+                  return false if payload.keys.length == 0
+                end
 
                 validation_results = {}
 
@@ -67,6 +71,14 @@ module OASDB
               def read_obj(key)
                 obj = ds[key]
                 [!obj.nil?, obj]
+              end
+
+              def update_obj(key, payload)
+                obj = ds[key]
+                return false if obj.nil?
+
+                ds[key] = ds[key].merge(payload)
+                true
               end
 
               def delete_obj(key)
@@ -93,8 +105,7 @@ module OASDB
             request.body.rewind
             schema = #{schema}
             payload = JSON.parse(request.body.read)
-            has_extra_keys, sanitized_payload = api_helper.sanitize_payload(payload, schema)
-            halt 422 if has_extra_keys
+            sanitized_payload = api_helper.sanitize_payload(payload, schema)
             halt 422 unless api_helper.valid_obj?(sanitized_payload, schema)
 
             result, obj = api_helper.create_obj(sanitized_payload)
@@ -129,6 +140,37 @@ module OASDB
             res_header = { 'Content-Type' => 'application/json' }
 
             [#{response_code.to_i}, res_header, res_body]
+          rescue ArgumentError
+            halt 404
+          end
+
+        RUBY
+      end
+
+      def gen_code_update_operation(oas_seed, oas_operation)
+        path = oas_operation.keys.first
+        method = oas_operation[path].keys.first
+        response_code = oas_operation[path][method]['responses'].keys.first
+        schema_location = oas_operation[path][method]['requestBody']['content']['application/json']['schema']['$ref'].split('/')[1..-1].concat(['properties'])
+        schema = oas_seed.dig(*schema_location)
+
+        param = path.match(/\{(.+)\}/).captures.first
+        sinatra_path = path.gsub(/\{.+\}/, ":#{param}")
+
+        contents.concat <<~RUBY
+          #{method} '#{sinatra_path}' do
+            request.body.rewind
+            schema = #{schema}
+            payload = JSON.parse(request.body.read)
+            sanitized_payload = api_helper.sanitize_payload(payload, schema)
+            halt 422 unless api_helper.valid_obj?(sanitized_payload, schema, :update)
+
+            obj_id = Integer(params['#{param}'])
+            updated = api_helper.update_obj(obj_id, sanitized_payload)
+
+            halt 404 unless updated
+
+            #{response_code.to_i}
           rescue ArgumentError
             halt 404
           end
