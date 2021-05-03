@@ -28,6 +28,15 @@ module OASDB
                 @last_id += 1
               end
 
+              def parse_payload(raw_payload)
+                payload = JSON.parse(raw_payload)
+                obj_root = payload.is_a?(Hash)
+
+                [obj_root, payload]
+              rescue JSON::ParserError
+                [false, {}]
+              end
+
               def sanitize_payload(payload, schema)
                 sanitized_payload = payload.deep_dup
 
@@ -41,7 +50,7 @@ module OASDB
               def validate_field(name, value, schema)
                 OAS_RUBY_DATA_VALIDATION[schema.dig(name, 'type')].call(value)
                 true
-              rescue ArgumentError
+              rescue StandardError
                 false
               end
 
@@ -104,7 +113,10 @@ module OASDB
           #{method} '#{path}' do
             request.body.rewind
             schema = #{schema}
-            payload = JSON.parse(request.body.read)
+
+            acceptable, payload = api_helper.parse_payload(request.body.read)
+            halt 422 unless acceptable
+
             sanitized_payload = api_helper.sanitize_payload(payload, schema)
             halt 422 unless api_helper.valid_obj?(sanitized_payload, schema)
 
@@ -161,7 +173,10 @@ module OASDB
           #{method} '#{sinatra_path}' do
             request.body.rewind
             schema = #{schema}
-            payload = JSON.parse(request.body.read)
+
+            acceptable, payload = api_helper.parse_payload(request.body.read)
+            halt 422 unless acceptable
+
             sanitized_payload = api_helper.sanitize_payload(payload, schema)
             halt 422 unless api_helper.valid_obj?(sanitized_payload, schema, :update)
 
