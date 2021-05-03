@@ -12,6 +12,7 @@ module OASDB
         @contents = {}
         contents['openapi'] = '3.0.3'
         contents['info'] = oas_seed['info']
+        generate_servers
         contents['components'] = oas_seed['components']
         contents['paths'] = {}
         generate_ids
@@ -50,6 +51,15 @@ module OASDB
       end
 
       private
+
+      def generate_servers
+        # TODO Introduce a config file for OAS DB and use it here.
+        contents['servers'] = [
+          {
+            'url': ENV.fetch('OAS_DB_MOCK_API_URL', 'http://192.168.0.210:4567')
+          }
+        ]
+      end
 
       def generate_ids
         contents['components']['schemas']['Id'] = {
