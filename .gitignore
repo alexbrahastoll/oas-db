@@ -1,5 +1,7 @@
 TODO.md
 node_modules
 package-lock.json
-samples/template.json
+samples
+annotations
+apis
 .DS_Store
