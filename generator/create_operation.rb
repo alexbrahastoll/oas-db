@@ -19,7 +19,8 @@ module OASDB
                   'application/json' => {
                     'schema' => {
                       '$ref' => "#/components/schemas/#{sample.base_resource_name}"
-                    }
+                    },
+                    'example' => engine.gen_example(sample, ['paths', generated_path, 'requestBody', 'content', 'application/json', 'example'])
                   }
                 }
               },

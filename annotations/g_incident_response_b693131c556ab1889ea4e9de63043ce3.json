@@ -1,1 +1,0 @@
-{"version":"0.1","annotationTarget":"samples/g_incident_response_b693131c556ab1889ea4e9de63043ce3.json","antipatterns":[{"name":"crudy_uri","offender":["paths","/formulate_incidents"]},{"name":"crudy_uri","offender":["paths","/fetch_incidents/{incident_id}"]}]}

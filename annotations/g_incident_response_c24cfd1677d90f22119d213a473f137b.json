@@ -1,1 +1,0 @@
-{"version":"0.1","annotationTarget":"samples/g_incident_response_c24cfd1677d90f22119d213a473f137b.json","antipatterns":[{"name":"inappropriate_http_method","offender":["paths","/incidents","put"]},{"name":"inappropriate_http_method","offender":["paths","/incidents/{incident_id}","delete"]}]}

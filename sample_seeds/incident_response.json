@@ -22,6 +22,11 @@
             "description": "The ID of the colaborator assigned to deal with the issue.",
             "type": "integer"
           }
+        },
+        "example": {
+          "title": "30 minutes outage due to someone tripping on the server's power cable.",
+          "service_id": 101,
+          "assignee_id": 11
         }
       }
     }

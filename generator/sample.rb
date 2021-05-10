@@ -29,6 +29,10 @@ module OASDB
         base_resource_name.downcase
       end
 
+      def base_resource_example
+        base_resource[base_resource_name]['example']
+      end
+
       def basename
         "g_#{oas_seed_basename}_#{md5}"
       end

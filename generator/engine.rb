@@ -26,7 +26,7 @@ module OASDB
         #   JSON.
         #     parse(File.read('meta/antipatterns.json')).
         #     map { |antipattern| antipattern['name'] }
-        @antipatterns = ['crudy_uri', 'amorphous_uri', 'ignoring_status_code', 'inappropriate_http_method']
+        @antipatterns = ['crudy_uri', 'amorphous_uri', 'ignoring_status_code', 'inappropriate_http_method', 'invalid_examples']
 
       end
 
@@ -57,7 +57,8 @@ module OASDB
         antipatterns_num = random.rand(antipatterns.length) + 1 # +1 guarantees a range from 1 to length
         shuffled_antipatterns = antipatterns.shuffle(random: random)
         # @raffled_antipatterns = shuffled_antipatterns.take(antipatterns_num)
-        @raffled_antipatterns = []
+        # @raffled_antipatterns = []
+        @raffled_antipatterns = ['invalid_examples']
 
         sample = OASDB::Generator::Sample.new(oas_seed, oas_seed_basename, raffled_antipatterns)
 
@@ -86,7 +87,11 @@ module OASDB
           sample.contents['paths'].merge!(oas_delete_operation)
         end
 
-        api = OASDB::Generator::API.new
+        # api_issues = ['invalid_payload', 'unexpected_payload_root_node', 'payload_missing_keys',
+        #   'payload_extra_keys', 'payload_wrong_data_types', 'broken_record_deletion']
+        # api_issues = ['payload_wrong_data_types']
+        api_issues = []
+        api = OASDB::Generator::API.new(api_issues)
         api.gen_setup_code
         api.gen_code_create_operation(oas_seed, oas_create_operation)
         api.gen_code_read_operation(oas_seed, oas_read_operation)
@@ -94,6 +99,13 @@ module OASDB
         api.gen_code_delete_operation(oas_seed, oas_delete_operation)
 
         [sample, api]
+      end
+
+      def gen_example(sample, breadcrumb)
+        return sample.base_resource_example unless raffled_antipatterns.include?('invalid_examples')
+
+        sample.annotation.add_antipattern('invalid_examples', breadcrumb)
+        sample.base_resource_example.deep_dup.slice(sample.base_resource_example.keys.first)
       end
 
       def gen_response_code(sample, correct_code, breadcrumb)

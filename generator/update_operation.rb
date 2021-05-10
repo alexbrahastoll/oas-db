@@ -13,6 +13,9 @@ module OASDB
               'summary' => "Updates a #{sample.base_resource_pretty_name}",
               'operationId' => "update_#{sample.base_resource_pretty_name}",
               'tags' => [sample.base_resource_pretty_name],
+              'parameters' => [
+                { '$ref' => "#/components/parameters/#{sample.resource_id_name(sample.base_resource_name, :camelcase)}" }
+              ],
               'requestBody' => {
                 'description' => "The #{sample.base_resource_pretty_name} to be updated.",
                 'required' => true,

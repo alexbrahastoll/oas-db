@@ -1,7 +1,11 @@
 module OASDB
   module Generator
     class API
-      attr_accessor :contents
+      attr_accessor :api_issues, :contents
+
+      def initialize(api_issues)
+        @api_issues = api_issues
+      end
 
       def gen_setup_code
         @contents = <<~RUBY
@@ -11,15 +15,62 @@ module OASDB
           require 'active_support/all'
 
           module OASDB
+            class IssueInjector
+              class InvalidPayloadError < StandardError; end
+              class UnexpectedPayloadRootNodeError < StandardError; end
+              class PayloadMissingKeysError < StandardError; end
+              class PayloadExtraKeysError < StandardError; end
+              class PayloadWrongDataTypesError < StandardError; end
+
+              API_ISSUES = #{api_issues}.freeze
+
+              def invalid_payload_err
+                return unless API_ISSUES.include?('invalid_payload')
+
+                raise InvalidPayloadError
+              end
+
+              def unexpected_payload_root_node_err(unexpected_root)
+                return unless API_ISSUES.include?('unexpected_payload_root_node')
+
+                raise UnexpectedPayloadRootNodeError if unexpected_root
+              end
+
+              def payload_missing_keys_err(payload, schema)
+                return unless API_ISSUES.include?('payload_missing_keys')
+
+                raise PayloadMissingKeysError if payload.keys.length < schema.keys.length
+              end
+
+              def payload_extra_keys_err(payload, schema)
+                return unless API_ISSUES.include?('payload_extra_keys')
+
+                raise PayloadExtraKeysError if payload.keys.length > schema.keys.length
+              end
+
+              def payload_wrong_data_types_err(valid)
+                return unless API_ISSUES.include?('payload_wrong_data_types')
+
+                raise PayloadWrongDataTypesError unless valid
+              end
+
+              def broken_record_deletion_err
+                API_ISSUES.include?('broken_record_deletion')
+              end
+            end
+
             class GeneratedAPIHelper
-              attr_reader :last_id, :ds
+              attr_reader :injector, :last_id, :ds
 
               OAS_RUBY_DATA_VALIDATION = {
-                'string' => ->(data) { raise ArgumentError if String(data).length == 0 },
-                'integer' => ->(data) { Integer(data) }
+                'integer' => ->(data) { Integer(data) },
+                'string'  => ->(data) { raise ArgumentError if String(data).length == 0 },
+                'number'  => ->(data) { Float(data) },
+                'boolean' => ->(data) { raise ArgumentError unless [true, false].include?(data) }
               }.freeze
 
               def initialize
+                @injector = OASDB::IssueInjector.new
                 @last_id = 0
                 @ds = {}
               end
@@ -30,19 +81,28 @@ module OASDB
 
               def parse_payload(raw_payload)
                 payload = JSON.parse(raw_payload)
-                obj_root = payload.is_a?(Hash)
+                expected_root = payload.is_a?(Hash)
 
-                [obj_root, payload]
+                injector.unexpected_payload_root_node_err(!expected_root)
+
+                [expected_root, payload]
               rescue JSON::ParserError
+                injector.invalid_payload_err
+
                 [false, {}]
               end
 
               def sanitize_payload(payload, schema)
+                injector.payload_missing_keys_err(payload, schema)
+                injector.payload_extra_keys_err(payload, schema)
+
                 sanitized_payload = payload.deep_dup
 
                 payload.each do |name, value|
                   sanitized_payload.delete(name) unless schema[name].present?
                 end
+
+                injector.payload_missing_keys_err(sanitized_payload, schema)
 
                 sanitized_payload
               end
@@ -65,6 +125,8 @@ module OASDB
 
                 payload.each do |name, value|
                   validation_results[name] = validate_field(name, value, schema)
+
+                  injector.payload_wrong_data_types_err(validation_results[name])
                 end
 
                 validation_results.values.all?
@@ -91,8 +153,11 @@ module OASDB
               end
 
               def delete_obj(key)
-                obj = ds.delete(key)
-                !obj.nil?
+                return false if ds[key].nil?
+                return true if injector.broken_record_deletion_err
+
+                ds.delete(key)
+                true
               end
             end
           end
