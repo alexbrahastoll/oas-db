@@ -1,0 +1,1 @@
+{"oas_seed_abs_path":"/Users/alexbrahastoll/Projects/mestrado/oas_db/sample_seeds/incident_response.json","mock_api_server_url":"http://192.168.0.210:4567","spec_issues":[],"api_issues":["unexpected_payload_root_node"],"generated_files_basename":"incident_response_unexpected_payload_root_node"}
