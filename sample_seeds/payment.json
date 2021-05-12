@@ -1,0 +1,34 @@
+{
+  "info": {
+    "title": "Payments Provider API.",
+    "description": "API that allows one to charge customers via credit card.",
+    "version": "0.1"
+  },
+  "components": {
+    "schemas": {
+      "Charge": {
+        "type": "object",
+        "description": "A charge.",
+        "properties": {
+          "amount": {
+            "description": "The amount to be charged.",
+            "type": "number"
+          },
+          "currency": {
+            "description": "Three-letter ISO currency code.",
+            "type": "string"
+          },
+          "credit_card_id": {
+            "description": "The credit card to be charged.",
+            "type": "integer"
+          }
+        },
+        "example": {
+          "amount": 20.50,
+          "currency": "USD",
+          "credit_card_id": 1
+        }
+      }
+    }
+  }
+}

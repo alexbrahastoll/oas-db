@@ -1,0 +1,29 @@
+{
+  "info": {
+    "title": "Project management API",
+    "description": "API that allows one to manage ongoing projects in a company (e.g., create / read / update / delete projects).",
+    "version": "0.1"
+  },
+  "components": {
+    "schemas": {
+      "Project": {
+        "type": "object",
+        "description": "A project.",
+        "properties": {
+          "name": {
+            "description": "The name of the project.",
+            "type": "string"
+          },
+          "description": {
+            "description": "A meaningful description of the project.",
+            "type": "string"
+          }
+        },
+        "example": {
+          "name": "Client A",
+          "description": "An awesome project for Client A."
+        }
+      }
+    }
+  }
+}
