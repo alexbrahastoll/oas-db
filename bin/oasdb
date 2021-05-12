@@ -1,0 +1,40 @@
+#!/usr/bin/env ruby
+
+require_relative '../generator/engine'
+
+with_success = 0
+with_error = 1
+config_path = ARGV[0]
+
+if ARGV.length == 0
+  help = <<~HELP
+    OAS DB is a solution to help researchers validate OpenAPI related tools.
+    It allows one to generate OpenAPI specifications, annotation files and mock API implementations from seed files.
+    For detailed information on how to use this tool, please visit our main GitHub repository.
+
+    USAGE: oasdb path_to_config.json
+  HELP
+  puts(help)
+  exit(with_error)
+end
+
+begin
+  config = JSON.parse(File.read(config_path))
+
+  puts('OAS DB working... please, wait...')
+  engine =
+    OASDB::Generator::Engine.new(1368,
+      config.fetch('oas_seed_abs_path'),
+      1,
+      config.fetch('spec_issues'),
+      config.fetch('api_issues'),
+      config.slice('generated_files_basename'))
+  engine.run
+  puts('Done!')
+
+  exit(with_success)
+rescue StandardError => e
+  puts('Oops, there was an unexpected problem.')
+  puts(e.to_s)
+  exit(with_error)
+end
