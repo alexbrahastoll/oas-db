@@ -1,13 +1,14 @@
 module OASDB
   module Generator
     class Sample
-      attr_accessor :oas_seed, :oas_seed_basename, :raffled_antipatterns, :base_resource, :contents, :annotation
+      attr_accessor :oas_seed, :oas_seed_basename, :raffled_antipatterns, :base_resource, :contents, :annotation, :options
 
-      def initialize(oas_seed, oas_seed_basename, raffled_antipatterns)
+      def initialize(oas_seed, oas_seed_basename, raffled_antipatterns, opts = {})
         @oas_seed = oas_seed
         @oas_seed_basename = oas_seed_basename
         @raffled_antipatterns = raffled_antipatterns
         @base_resource = oas_seed['components']['schemas'].slice(oas_seed['components']['schemas'].keys.first)
+        @options = opts
 
         @contents = {}
         contents['openapi'] = '3.0.3'
@@ -34,11 +35,19 @@ module OASDB
       end
 
       def basename
-        "g_#{oas_seed_basename}_#{md5}"
+        if options['generated_files_basename'].present?
+          options['generated_files_basename']
+        else
+          "g_#{oas_seed_basename}_#{md5}"
+        end
       end
 
       def basename_with_ext
-        "g_#{oas_seed_basename}_#{md5}.json"
+        if options['generated_files_basename'].present?
+          "#{options['generated_files_basename']}.json"
+        else
+          "g_#{oas_seed_basename}_#{md5}.json"
+        end
       end
 
       def resource_id_name(resource_name, style)

@@ -12,12 +12,12 @@ require_relative 'api'
 module OASDB
   module Generator
     class Engine
-      attr_accessor :random, :oas_seed, :oas_seed_basename, :desired_num_samples, :antipatterns, :generated_samples,
-        :generated_apis, :raffled_antipatterns
+      attr_accessor :random, :oas_seed, :oas_seed_basename, :desired_num_samples, :spec_issues, :api_issues,
+        :antipatterns, :generated_samples, :generated_apis, :raffled_antipatterns, :options
 
       HTTP_METHODS = ['get', 'post', 'head', 'put', 'patch', 'delete'].freeze
 
-      def initialize(random_generator_seed, oas_seed_path, desired_num_samples)
+      def initialize(random_generator_seed, oas_seed_path, desired_num_samples, spec_issues = [], api_issues = [], opts = {})
         @random = Random.new(random_generator_seed)
         @oas_seed = JSON.parse(File.read(oas_seed_path))
         @oas_seed_basename = File.basename(oas_seed_path, '.*')
@@ -27,7 +27,11 @@ module OASDB
         #     parse(File.read('meta/antipatterns.json')).
         #     map { |antipattern| antipattern['name'] }
         @antipatterns = ['crudy_uri', 'amorphous_uri', 'ignoring_status_code', 'inappropriate_http_method', 'invalid_examples']
-
+        @spec_issues = spec_issues
+        @api_issues = api_issues
+        @options = {
+          'generated_files_basename' => ''
+        }.merge(opts)
       end
 
       def run
@@ -58,9 +62,9 @@ module OASDB
         shuffled_antipatterns = antipatterns.shuffle(random: random)
         # @raffled_antipatterns = shuffled_antipatterns.take(antipatterns_num)
         # @raffled_antipatterns = []
-        @raffled_antipatterns = ['invalid_examples']
+        @raffled_antipatterns = spec_issues
 
-        sample = OASDB::Generator::Sample.new(oas_seed, oas_seed_basename, raffled_antipatterns)
+        sample = OASDB::Generator::Sample.new(oas_seed, oas_seed_basename, raffled_antipatterns, options)
 
         oas_create_operation = OASDB::Generator::CreateOperation.new.generate(self, sample)
         oas_read_operation = OASDB::Generator::ReadOperation.new.generate(self, sample)
@@ -87,11 +91,11 @@ module OASDB
           sample.contents['paths'].merge!(oas_delete_operation)
         end
 
-        # api_issues = ['invalid_payload', 'unexpected_payload_root_node', 'payload_missing_keys',
+        # selected_api_issues = ['invalid_payload', 'unexpected_payload_root_node', 'payload_missing_keys',
         #   'payload_extra_keys', 'payload_wrong_data_types', 'broken_record_deletion']
-        # api_issues = ['payload_wrong_data_types']
-        api_issues = []
-        api = OASDB::Generator::API.new(api_issues)
+        selected_api_issues = api_issues
+        selected_api_issues.each { |issue| sample.annotation.add_api_issue(issue) }
+        api = OASDB::Generator::API.new(selected_api_issues)
         api.gen_setup_code
         api.gen_code_create_operation(oas_seed, oas_create_operation)
         api.gen_code_read_operation(oas_seed, oas_read_operation)
@@ -217,5 +221,3 @@ module OASDB
     end
   end
 end
-
-OASDB::Generator::Engine.new(1368, 'sample_seeds/incident_response.json', 1).run
