@@ -8,8 +8,8 @@ api_issues = ['invalid_payload', 'unexpected_payload_root_node', 'payload_missin
 configs = []
 seeds.each do |s|
   configs << {
-    oas_seed_abs_path: "/Users/alexbrahastoll/Projects/mestrado/oas_db/sample_seeds/#{s}",
-    mock_api_server_url: 'http://192.168.0.210:4567',
+    oas_seed_abs_path: "/SOME_PATH/#{s}",
+    mock_api_server_url: 'http://localhost:3000',
     spec_issues: spec_issues,
     api_issues: [],
     generated_files_basename: "#{s.split('.').first}_#{spec_issues.first}"
@@ -17,8 +17,8 @@ seeds.each do |s|
 
   api_issues.each do |api_issue|
     configs << {
-      oas_seed_abs_path: "/Users/alexbrahastoll/Projects/mestrado/oas_db/sample_seeds/#{s}",
-      mock_api_server_url: 'http://192.168.0.210:4567',
+      oas_seed_abs_path: "/SOME_PATH/#{s}",
+      mock_api_server_url: 'http://localhost:3000',
       spec_issues: [],
       api_issues: [api_issue],
       generated_files_basename: "#{s.split('.').first}_#{api_issue}"

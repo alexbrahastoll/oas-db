@@ -30,6 +30,7 @@ module OASDB
         @spec_issues = spec_issues
         @api_issues = api_issues
         @options = {
+          'mock_api_server_url' => 'http://localhost:3000',
           'generated_files_basename' => ''
         }.merge(opts)
       end

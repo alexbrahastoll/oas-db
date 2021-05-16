@@ -1,1 +1,0 @@
-{"oas_seed_abs_path":"/Users/alexbrahastoll/Projects/mestrado/oas_db/sample_seeds/payment.json","mock_api_server_url":"http://192.168.0.210:4567","spec_issues":[],"api_issues":["payload_wrong_data_types"],"generated_files_basename":"payment_payload_wrong_data_types"}

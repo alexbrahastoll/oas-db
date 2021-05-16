@@ -46,7 +46,7 @@ RUN asdf plugin-add python && \
   asdf global ruby 2.7.2
 RUN python3 -m ensurepip && \
   pip3 install --upgrade pip
-RUN git clone https://github.com/microsoft/restler-fuzzer.git ~/restler-fuzzer && \
+RUN git clone -b v7.3.0 --single-branch https://github.com/microsoft/restler-fuzzer.git ~/restler-fuzzer && \
   mkdir ~/restler-fuzzer-bin && \
   cd ~/restler-fuzzer && \
   pip3 install requests && \
@@ -56,4 +56,4 @@ RUN git clone https://github.com/microsoft/restler-fuzzer.git ~/restler-fuzzer &
 COPY . /root/oas_db
 RUN cd ~/oas_db && \
   bundle install
-RUN mkdir ~/oas_db_logs
+RUN mkdir ~/oas_db_restler_experiment

@@ -66,10 +66,9 @@ module OASDB
       private
 
       def generate_servers
-        # TODO Introduce a config file for OAS DB and use it here.
         contents['servers'] = [
           {
-            'url': ENV.fetch('OAS_DB_MOCK_API_URL', 'http://192.168.0.210:4567')
+            'url': options['mock_api_server_url']
           }
         ]
       end

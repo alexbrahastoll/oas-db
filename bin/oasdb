@@ -28,7 +28,7 @@ begin
       1,
       config.fetch('spec_issues'),
       config.fetch('api_issues'),
-      config.slice('generated_files_basename'))
+      config.slice('mock_api_server_url', 'generated_files_basename'))
   engine.run
   puts('Done!')
 
