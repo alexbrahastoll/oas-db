@@ -1,53 +1,36 @@
 # OAS DB
 
-OAS DB is an effort to build a repository of synthetic (but realistic) OpenAPI specification samples with known antipatterns. Each specification is also accompanied by an annotation file in the JSON format. The annotation file lists all antipatterns found in the related specification, describing which part of the spec is responsible for which offense.
+OAS DB (OpenAPI Specifications Database) aims to provide researchers and industry practitioners a complete solution to streamline the validation of new OpenAPI related techniques and tools. From a small file containing basic information about an API, it is able to generate a complete OpenAPI specification (with the four basic CRUD operations), a mock API implementation and an annotation file (specifying issues and faults that the user may have decided to have the tool inject in these generated assets).
 
-The annotation files follow a clearly defined schema (soon to be added to this repository) and therefore are a convenient tool for researchers to programatically verify the performance of their tools when run against OAS DB.
+## Running OAS DB
 
-OAS DB is a work in progress and although it currently has only a few OpenAPI samples, new one are being added every week or so.
+The easiest way to run OAS DB is using the provided Dockerfile in the root of this repository to build a container with all the required dependencies.
 
-If you are interested in the project, we recommend you also read [the paper we presented at SATToSE 2020](http://sattose.org/).
+## OAS DB CLI
 
-## Repository structure
-
-OAS DB is composed of the following directories and files:
-
-### samples
-
-This directory contains all OpenAPI samples.
-
-### annotations
-
-This directory contains all annotation files. Each annotation file describes all the antipatterns present in the corresponding OpenAPI sample.
-
-Example: `annotations/orders.json` lists all the antipatterns to be found in `samples/orders.json`
-
-### meta
-
-This directory contains files that supplement and enhance OAS DB itself.
-
-## List of available samples
-
-_To check the antipatterns present in each specification, refer to the corresponding annotation file._
-
-**ecommerce.yml (and ecommerce.json annotation)**
-
-Describes an ecommerce API.
-
-**payment.yml (and payment.json annotation)**
-
-Describes a payments provider API.
-
-## Adding / editing samples
-
-> IMPORTANT: We are not accepting contributions at the moment. This section is a work in progress for the process we are envisioning after contributions are open to the research community at large.
-
-Before adding or editing a sample, please run it through the IBM OpenAPI Validator
-(using the configurations present in the `.validaterc` in the root of this project)
-and make sure it passes the linter.
-
-If the linter is installed, run the following command in the root of this project:
+OAS DB comes with a simple CLI (inside bin/oasdb) that expects a configuration file in the JSON format. A sample configuration file is presented below:
 
 ```
-lint-openapi a-sample-name.yml
+{
+  "oas_seed_abs_path": "/absolute_path/incident_response.json", # Absolute path to an OpenAPI specification seed.
+  "mock_api_server_url": "http://localhost:3000", # URL where the mock API will be reachable when running.
+  "spec_issues": [
+    "invalid_examples" # List of issues that affect the generated OpenAPI specification.
+  ],
+  "api_issues": [
+    "broken_record_deletion" # List of issues that affect the generated Ruby mock API implementation.
+  ],
+  "generated_files_basename": "incident_response_invalid_examples" # The basename for the assets to be generated.
+}
 ```
+
+To run the CLI (from within the projects root folder), call it passing the absolute path to a configuration file:
+
+```
+bin/oasdb path_to_config.json
+```
+
+## Extra information
+
+More detailed docs are coming in the future. For now, please refer to the associated ISSRE 2021 submission. It explains
+in greater depth how OAS DB works.
