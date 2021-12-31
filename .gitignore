@@ -5,3 +5,4 @@ samples
 annotations
 apis
 .DS_Store
+*.jar

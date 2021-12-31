@@ -15,7 +15,7 @@ module OASDB
               'tags' => [sample.base_resource_pretty_name],
               'parameters' => [
                 { '$ref' => "#/components/parameters/#{sample.resource_id_name(sample.base_resource_name, :camelcase)}" }
-              ],
+              ].concat(engine.gen_extra_params(sample, ['paths', generated_path, pregenerated_method, 'parameters'])),
               'responses' => {
                 engine.gen_response_code(sample, 200, ['paths', generated_path, pregenerated_method, 'responses']) => {
                   'description' => 'OK.',

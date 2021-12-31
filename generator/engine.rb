@@ -26,7 +26,7 @@ module OASDB
         #   JSON.
         #     parse(File.read('meta/antipatterns.json')).
         #     map { |antipattern| antipattern['name'] }
-        @antipatterns = ['crudy_uri', 'amorphous_uri', 'ignoring_status_code', 'inappropriate_http_method', 'invalid_examples']
+        @antipatterns = ['crudy_uri', 'amorphous_uri', 'ignoring_status_code', 'inappropriate_http_method', 'invalid_examples', 'sensitive_info_pqs']
         @spec_issues = spec_issues
         @api_issues = api_issues
         @options = {
@@ -144,6 +144,17 @@ module OASDB
         path
       end
 
+      def gen_extra_params(sample, breadcrumb)
+        params = []
+
+        if raffled_antipatterns.include?('sensitive_info_pqs')
+          params << sensitive_info_pqs
+          sample.annotation.add_antipattern('sensitive_info_pqs', breadcrumb + [sensitive_info_pqs[sensitive_info_pqs.keys.first]['name']])
+        end
+
+        params
+      end
+
       def pregen_method(correct_method)
         return correct_method unless raffled_antipatterns.include?('inappropriate_http_method')
 
@@ -218,6 +229,17 @@ module OASDB
 
       def amorphous_uri(path)
         AMORPHOUS_URI_DISTORTIONS.sample(random: random).call(path)
+      end
+
+      def sensitive_info_pqs
+        {
+          'Token' => {
+            'name' => 'token',
+            'description' => 'Token for accessing the API.',
+            'in' => 'query',
+            'required' => true
+          }
+        }
       end
     end
   end
