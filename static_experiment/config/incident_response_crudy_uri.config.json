@@ -1,0 +1,7 @@
+{
+  "oas_seed_abs_path": "/Users/alexbrahastoll/Projects/mestrado/oas_db/sample_seeds/incident_response.json",
+  "mock_api_server_url": "http://localhost:3000",
+  "spec_issues": ["crudy_uri"],
+  "api_issues": [],
+  "generated_files_basename": "incident_response_crudy_uri"
+}
