@@ -1,11 +1,6 @@
 require 'fileutils'
 require 'active_support/all'
 
-# IMPORTANT: Add the desired version of RESTest to ./restest_experiment as restest.jar
-# before running this script.
-#
-# Run this script from within the 'restest_experiment' directory.
-
 # IMPORTANT:
 # Insert the absolute path of oas_db as the value of home.
 # Insert the absolute path of the RESTest project as the value of restest_home.
@@ -68,7 +63,7 @@ samples.each do |sample|
     generator=FT
 
     # Number of test cases to be generated per operation on each iteration
-    testsperoperation=1
+    testsperoperation=4
 
     # OAS specification
     oas.path=#{api_spec_path}
@@ -95,7 +90,7 @@ samples.each do |sample|
     stats.csv=false
 
     # Maximum number of test cases to be generated
-    numtotaltestcases=4
+    numtotaltestcases=224
 
     # Optional delay between each iteration (in seconds)
     delay=-1

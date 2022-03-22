@@ -7,3 +7,7 @@ apis
 .DS_Store
 *.jar
 experiment_run_*
+restest_experiment/config
+restler_experiment/config
+static_experiment/config
+static_experiment/oasis_batch.json

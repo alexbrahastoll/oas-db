@@ -1,1 +1,0 @@
-{"oas_seed_abs_path":"/Users/alexbrahastoll/Projects/mestrado/oas_db/sample_seeds/payment.json","mock_api_server_url":"http://localhost:3000","spec_issues":["broken_record_deletion"],"api_issues":[],"generated_files_basename":"payment"}
