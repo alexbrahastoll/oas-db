@@ -2,6 +2,8 @@
 
 OAS DB (OpenAPI Specifications Database) aims to provide researchers and industry practitioners a complete solution to streamline the validation of new OpenAPI related techniques and tools. From a small file containing basic information about an API, it is able to generate a complete OpenAPI specification (with the four basic CRUD operations), a mock API implementation and an annotation file (specifying issues and faults that the user may have decided to have the tool inject in these generated assets).
 
+![](./oas_db_architecture.png)
+
 ## Running OAS DB
 
 ### Dockerfile
